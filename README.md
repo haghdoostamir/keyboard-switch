@@ -40,13 +40,13 @@ The `.exe` isn't code-signed, so Windows SmartScreen may warn the first time
 - **It's built by GitHub from this repository**, not on someone's computer. Every release carries
   a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations):
   ```sh
-  gh attestation verify KeyboardSwitch.exe --repo OWNER/REPO
+  gh attestation verify KeyboardSwitch.exe --repo haghdoostamir/keyboard-switch
   ```
 - Compare the SHA256 with the `.sha256` file of the release:
   `Get-FileHash KeyboardSwitch.exe` in PowerShell.
 - **Or build it yourself in seconds**: Windows already contains the C# compiler.
   ```powershell
-  git clone https://github.com/OWNER/REPO; cd REPO\windows
+  git clone https://github.com/haghdoostamir/keyboard-switch; cd keyboard-switch\windows
   powershell -ExecutionPolicy Bypass -File build.ps1 -Test
   ```
 
