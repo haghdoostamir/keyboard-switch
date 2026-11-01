@@ -1,0 +1,6 @@
+# Python
+__pycache__/
+*.pyc
+
+# Windows build output
+windows/dist/

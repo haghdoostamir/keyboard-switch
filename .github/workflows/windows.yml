@@ -1,0 +1,59 @@
+# Windows version: build and test on every push / pull request. Pushing a tag like v1.2.0 also
+# publishes a GitHub release with KeyboardSwitch.exe, its SHA256 and a build provenance
+# attestation (proof that the file was built from this repository by this workflow).
+name: Windows
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write       # create the release
+      id-token: write       # sign the attestation
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and test
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '' }
+          if ($version) { ./windows/build.ps1 -Test -Version $version } else { ./windows/build.ps1 -Test }
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash windows/dist/KeyboardSwitch.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  KeyboardSwitch.exe" | Set-Content -Encoding ascii windows/dist/KeyboardSwitch.exe.sha256
+          Get-Content windows/dist/KeyboardSwitch.exe.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KeyboardSwitch
+          path: |
+            windows/dist/KeyboardSwitch.exe
+            windows/dist/KeyboardSwitch.exe.sha256
+
+      - name: Attest build provenance
+        if: github.ref_type == 'tag'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: windows/dist/KeyboardSwitch.exe
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME `
+            windows/dist/KeyboardSwitch.exe windows/dist/KeyboardSwitch.exe.sha256 `
+            --title "Keyboard Switch $env:GITHUB_REF_NAME" --generate-notes

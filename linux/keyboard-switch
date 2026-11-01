@@ -1,0 +1,4 @@
+#!/bin/sh
+# Launcher: keyboard-switch [--hidden] [--convert]
+dir="$(dirname "$(readlink -f "$0")")"
+PYTHONPATH="$dir${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m keyboard_switch "$@"
