@@ -32,7 +32,8 @@ jobs:
         shell: pwsh
         run: |
           $hash = (Get-FileHash windows/dist/KeyboardSwitch.exe -Algorithm SHA256).Hash.ToLower()
-          "$hash  KeyboardSwitch.exe" | Set-Content -Encoding ascii windows/dist/KeyboardSwitch.exe.sha256
+          # LF line ending, so `sha256sum -c` works too.
+          [IO.File]::WriteAllText("$PWD/windows/dist/KeyboardSwitch.exe.sha256", "$hash  KeyboardSwitch.exe`n")
           Get-Content windows/dist/KeyboardSwitch.exe.sha256
 
       - uses: actions/upload-artifact@v4
