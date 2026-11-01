@@ -2,6 +2,8 @@
 
 **Typed a whole sentence in the wrong keyboard layout? Select it, press one shortcut, done.**
 
+![Demo: text typed with the English layout by mistake is converted to Persian with one shortcut](docs/demo.gif)
+
 ```
 sghl o,fd?   →   سلام خوبی؟
 ```
